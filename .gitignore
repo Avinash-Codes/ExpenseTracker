@@ -13,8 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
-
-# Custom untracked/dev files
 build.log
 out.txt
 /.idea/deploymentTargetSelector.xml
