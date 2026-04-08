@@ -40,7 +40,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Star
@@ -59,6 +59,7 @@ fun HomeScreen(
     onDeleteTransaction: (Transaction) -> Unit,
     onToggleFavorite: (Transaction) -> Unit,
     onToggleFavoritesFilter: () -> Unit = {},
+    onAddTransaction: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -69,7 +70,7 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Transparent),
-        contentPadding = PaddingValues(bottom = 100.dp)
+        contentPadding = PaddingValues(bottom = 140.dp)
     ) {
         item {
             Column(
@@ -136,14 +137,10 @@ fun HomeScreen(
                                 tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
-                        IconButton(
-                            onClick = {
-                                Toast.makeText(context, "No new notifications", Toast.LENGTH_SHORT).show()
-                            }
-                        ) {
+                        IconButton(onClick = onAddTransaction) {
                             Icon(
-                                imageVector = Icons.Rounded.Notifications,
-                                contentDescription = "Notifications",
+                                imageVector = Icons.Rounded.Add,
+                                contentDescription = "Add Transaction",
                                 tint = MaterialTheme.colorScheme.onBackground
                             )
                         }

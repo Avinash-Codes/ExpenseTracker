@@ -38,7 +38,7 @@ fun StatsScreen(
             .fillMaxSize()
             .background(androidx.compose.ui.graphics.Color.Transparent)
             .verticalScroll(rememberScrollState())
-            .padding(bottom = 100.dp)
+            .padding(bottom = 140.dp)
     ) {
         // Header
         Column(
@@ -91,38 +91,10 @@ fun StatsScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Currency Selector
-        var selectedCurrency by remember { mutableStateOf("INR") }
-        val exchangeRates = mapOf("INR" to 1.0, "USD" to 0.012, "EUR" to 0.011)
-        val currentRate = exchangeRates[selectedCurrency] ?: 1.0
-        val currencySymbol = when(selectedCurrency) {
-            "INR" -> "₹"
-            "USD" -> "$"
-            "EUR" -> "€"
-            else -> "₹"
-        }
+        // Currency Selector Removed (User requested simple Rupee focus)
+        val currentRate = 1.0
+        val currencySymbol = "₹"
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listOf("INR", "USD", "EUR").forEach { currency ->
-                FilterChip(
-                    selected = selectedCurrency == currency,
-                    onClick = { selectedCurrency = currency },
-                    label = { Text(currency) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primary,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
 
         // Financial Health Score
         Column(

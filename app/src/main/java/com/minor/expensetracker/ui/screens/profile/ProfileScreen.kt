@@ -59,7 +59,7 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(androidx.compose.ui.graphics.Color.Transparent)
             .verticalScroll(rememberScrollState())
-            .padding(bottom = 100.dp)
+            .padding(bottom = 140.dp)
     ) {
         // Header
         Column(
@@ -221,14 +221,14 @@ private fun OverviewContent(
         ) {
             ProfileStatCard(
                 label = "Total Spent",
-                value = "$${String.format(java.util.Locale.US, "%,.0f", totalSpendings)}",
+                value = "₹${String.format(java.util.Locale.US, "%,.0f", totalSpendings)}",
                 icon = Icons.Rounded.TrendingDown,
                 iconColor = ExpenseRed,
                 modifier = Modifier.weight(1f)
             )
             ProfileStatCard(
                 label = "Net Balance",
-                value = "$${String.format(java.util.Locale.US, "%,.0f", balance)}",
+                value = "₹${String.format(java.util.Locale.US, "%,.0f", balance)}",
                 icon = Icons.Rounded.AccountBalanceWallet,
                 iconColor = IncomeGreen,
                 modifier = Modifier.weight(1f)

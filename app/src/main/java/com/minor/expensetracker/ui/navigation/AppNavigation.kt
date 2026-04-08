@@ -183,28 +183,14 @@ fun AppNavigation(
                 }
             }
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showAddTransaction = true },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = CircleShape,
-                modifier = Modifier
-                    .padding(bottom = 70.dp)
-                    .size(56.dp)
-            ) {
-                Icon(
-                    Icons.Rounded.Add,
-                    contentDescription = "Add Transaction",
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-        }
+        // FAB removed; add transaction moved to top bar
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = BottomNavItem.Home.route,
-            modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
+            modifier = Modifier
+                .padding(top = innerPadding.calculateTopPadding())
+                .imePadding(),
             enterTransition = {
                 fadeIn(tween(300)) + slideInHorizontally(tween(300)) { it / 4 }
             },
@@ -232,7 +218,8 @@ fun AppNavigation(
                     onSearchQueryChange = { transactionViewModel.setSearchQuery(it) },
                     onDeleteTransaction = { transactionViewModel.deleteTransaction(it) },
                     onToggleFavorite = { transactionViewModel.toggleFavorite(it) },
-                    onToggleFavoritesFilter = { transactionViewModel.toggleFavoritesFilter() }
+                    onToggleFavoritesFilter = { transactionViewModel.toggleFavoritesFilter() },
+                    onAddTransaction = { showAddTransaction = true }
                 )
             }
 

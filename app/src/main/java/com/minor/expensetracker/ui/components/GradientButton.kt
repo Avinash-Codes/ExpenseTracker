@@ -68,7 +68,7 @@ fun AnimatedCounter(
     targetValue: Double,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.displayMedium,
-    prefix: String = "$",
+    prefix: String = "₹",
     animationDuration: Int = 800
 ) {
     var previousValue by remember { mutableDoubleStateOf(0.0) }

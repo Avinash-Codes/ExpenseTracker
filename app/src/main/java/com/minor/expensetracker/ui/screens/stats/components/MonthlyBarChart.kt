@@ -108,7 +108,7 @@ fun MonthlyBarChart(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "$${String.format(java.util.Locale.US, "%,.0f", data.sumOf { it.value.toDouble() })}",
+                text = "₹${String.format(java.util.Locale.US, "%,.0f", data.sumOf { it.value.toDouble() })}",
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.SemiBold,
                 color = Teal80

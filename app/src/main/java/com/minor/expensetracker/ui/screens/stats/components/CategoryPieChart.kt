@@ -72,7 +72,7 @@ fun CategoryPieChart(
             // Center text
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "$${String.format(java.util.Locale.US, "%,.0f", totalExpense)}",
+                    text = "₹${String.format(java.util.Locale.US, "%,.0f", totalExpense)}",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground

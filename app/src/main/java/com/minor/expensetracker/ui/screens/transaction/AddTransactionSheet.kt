@@ -142,7 +142,7 @@ fun AddTransactionSheet(
             },
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("Enter amount") },
-            prefix = { Text("$ ", fontWeight = FontWeight.Bold) },
+            prefix = { Text("₹ ", fontWeight = FontWeight.Bold) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Next
