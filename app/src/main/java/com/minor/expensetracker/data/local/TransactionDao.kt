@@ -69,4 +69,7 @@ interface TransactionDao {
 
     @Query("SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE type = :type")
     fun getTotalByType(type: String): Flow<Double>
+
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE type = 'EXPENSE' AND date BETWEEN :startDate AND :endDate")
+    fun getMonthlyExpenseTotal(startDate: Long, endDate: Long): Flow<Double>
 }

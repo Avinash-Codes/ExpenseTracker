@@ -18,13 +18,13 @@ val DarkBottomBar = Color(0xFF131322)
 val DarkInputField = Color(0xFF2A2A3E)
 
 // ── Light Theme Colors ──
-val LightBackground = Color(0xFFF8F9FD)
+val LightBackground = Color(0xFFF4F6FB)
 val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFF0F2F8)
+val LightSurfaceVariant = Color(0xFFEEF2F9)
 val LightCard = Color(0xFFFFFFFF)
-val LightCardElevated = Color(0xFFF5F7FA)
+val LightCardElevated = Color(0xFFF0F4FA)
 val LightBottomBar = Color(0xFFFFFFFF)
-val LightInputField = Color(0xFFF0F2F8)
+val LightInputField = Color(0xFFEEF2F9)
 
 // ── Text Colors ──
 val TextWhite = Color(0xFFFFFFFF)

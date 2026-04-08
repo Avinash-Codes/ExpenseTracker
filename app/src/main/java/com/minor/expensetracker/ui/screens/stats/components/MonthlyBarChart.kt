@@ -26,7 +26,7 @@ data class BarData(
 fun MonthlyBarChart(
     data: List<BarData>,
     modifier: Modifier = Modifier,
-    title: String = "Current margin: April Spendings"
+    title: String = "Last 6 months expenses"
 ) {
     val maxValue = data.maxOfOrNull { it.value } ?: 1f
 

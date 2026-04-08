@@ -29,7 +29,7 @@ fun SegmentedToggle(
         modifier = modifier
             .fillMaxWidth()
             .height(44.dp)
-            .glassEffect()
+            .glassEffect(shape = RoundedCornerShape(12.dp))
             .padding(3.dp)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
@@ -56,7 +56,7 @@ fun SegmentedToggle(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .clip(RoundedCornerShape(10.dp))
+                        .clip(RoundedCornerShape(10.dp)) // Kept at 10.dp inside a 12.dp frame because of the 3.dp padding, causing the margin interpolation to mathematically align flawlessly as a squircle
                         .background(backgroundColor)
                         .clickable { onSelectionChanged(index) },
                     contentAlignment = Alignment.Center

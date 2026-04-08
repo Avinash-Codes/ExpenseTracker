@@ -52,10 +52,13 @@ fun HomeScreen(
     summary: MonthlySummary,
     timeFilter: TimeFilter,
     searchQuery: String,
+    favoritesCount: Int = 0,
+    showFavoritesOnly: Boolean = false,
     onTimeFilterChange: (TimeFilter) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onDeleteTransaction: (Transaction) -> Unit,
     onToggleFavorite: (Transaction) -> Unit,
+    onToggleFavoritesFilter: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -107,6 +110,25 @@ fun HomeScreen(
 
                     // Action Icons
                     Row {
+                        // Favorites filter toggle
+                        IconButton(onClick = onToggleFavoritesFilter) {
+                            BadgedBox(
+                                badge = {
+                                    if (favoritesCount > 0) {
+                                        Badge(containerColor = MaterialTheme.colorScheme.primary) {
+                                            Text(favoritesCount.coerceAtMost(99).toString())
+                                        }
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Star,
+                                    contentDescription = "Favorites filter",
+                                    tint = if (showFavoritesOnly) MaterialTheme.colorScheme.primary
+                                           else MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                        }
                         IconButton(onClick = { isSearchActive = !isSearchActive }) {
                             Icon(
                                 imageVector = Icons.Rounded.Search,
@@ -115,21 +137,15 @@ fun HomeScreen(
                             )
                         }
                         IconButton(
-                            onClick = { 
-                                Toast.makeText(context, "No new notifications", Toast.LENGTH_SHORT).show() 
+                            onClick = {
+                                Toast.makeText(context, "No new notifications", Toast.LENGTH_SHORT).show()
                             }
                         ) {
-                            BadgedBox(
-                                badge = {
-                                    Badge(containerColor = ExpenseRed) { Text("2") }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Notifications,
-                                    contentDescription = "Notifications",
-                                    tint = MaterialTheme.colorScheme.onBackground
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Rounded.Notifications,
+                                contentDescription = "Notifications",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
                         }
                     }
                 }
@@ -233,7 +249,11 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (searchQuery.isNotEmpty()) "Search Results" else "Recent Transactions",
+                        text = when {
+                            searchQuery.isNotEmpty() -> "Search Results"
+                            showFavoritesOnly -> "Favourites"
+                            else -> "Recent Transactions"
+                        },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
@@ -242,7 +262,7 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                if (searchQuery.isEmpty()) {
+                if (searchQuery.isEmpty() && !showFavoritesOnly) {
                     SegmentedToggle(
                         options = listOf("Weekly", "Monthly"),
                         selectedIndex = if (timeFilter == TimeFilter.WEEKLY) 0 else 1,
@@ -261,8 +281,16 @@ fun HomeScreen(
         if (transactions.isEmpty()) {
             item {
                 EmptyState(
-                    title = if (searchQuery.isNotEmpty()) "No matches found" else "No transactions yet",
-                    subtitle = if (searchQuery.isNotEmpty()) "Try a different search term" else "Tap the + button to add your first income or expense"
+                    title = when {
+                        searchQuery.isNotEmpty() -> "No matches found"
+                        showFavoritesOnly -> "No favourites yet"
+                        else -> "No transactions yet"
+                    },
+                    subtitle = when {
+                        searchQuery.isNotEmpty() -> "Try a different search term"
+                        showFavoritesOnly -> "Tap the star on any transaction to save it here"
+                        else -> "Tap the + button to add your first income or expense"
+                    }
                 )
             }
         } else {
@@ -317,7 +345,7 @@ private fun SummaryCard(
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(
-            text = "$${String.format(java.util.Locale.US, "%,.0f", amount)}",
+            text = "₹${String.format(java.util.Locale.US, "%,.0f", amount)}",
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground

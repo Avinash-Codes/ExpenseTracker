@@ -22,6 +22,7 @@ import com.minor.expensetracker.ui.screens.stats.components.BarData
 import com.minor.expensetracker.ui.screens.stats.components.MonthlyBarChart
 import com.minor.expensetracker.ui.theme.*
 import com.minor.expensetracker.ui.viewmodel.MonthlySummary
+import com.minor.expensetracker.ui.viewmodel.MonthBarEntry
 import com.minor.expensetracker.ui.components.glassEffect
 
 @Composable
@@ -29,6 +30,7 @@ fun StatsScreen(
     creditScore: Int,
     summary: MonthlySummary,
     categoryBreakdown: List<CategorySum>,
+    monthlyBarData: List<MonthBarEntry> = emptyList(),
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -90,14 +92,14 @@ fun StatsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // Currency Selector
-        var selectedCurrency by remember { mutableStateOf("USD") }
-        val exchangeRates = mapOf("USD" to 1.0, "EUR" to 0.92, "CAD" to 1.35)
+        var selectedCurrency by remember { mutableStateOf("INR") }
+        val exchangeRates = mapOf("INR" to 1.0, "USD" to 0.012, "EUR" to 0.011)
         val currentRate = exchangeRates[selectedCurrency] ?: 1.0
         val currencySymbol = when(selectedCurrency) {
+            "INR" -> "₹"
             "USD" -> "$"
             "EUR" -> "€"
-            "CAD" -> "CA$"
-            else -> "$"
+            else -> "₹"
         }
 
         Row(
@@ -106,7 +108,7 @@ fun StatsScreen(
                 .padding(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            listOf("USD", "EUR", "CAD").forEach { currency ->
+            listOf("INR", "USD", "EUR").forEach { currency ->
                 FilterChip(
                     selected = selectedCurrency == currency,
                     onClick = { selectedCurrency = currency },
@@ -239,12 +241,11 @@ fun StatsScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             MonthlyBarChart(
-                data = listOf(
-                    BarData("Jan", (2500f * currentRate).toFloat()),
-                    BarData("Feb", (1800f * currentRate).toFloat()),
-                    BarData("Mar", (3200f * currentRate).toFloat()),
-                    BarData("Apr", (summary.totalExpense * currentRate).toFloat()),
-                )
+                data = if (monthlyBarData.isNotEmpty()) {
+                    monthlyBarData.map { BarData(it.label, it.value * currentRate.toFloat()) }
+                } else {
+                    listOf(BarData("—", 0f))
+                }
             )
         }
 

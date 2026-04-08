@@ -19,6 +19,8 @@ data class MonthlySummary(
     val balance: Double = 0.0
 )
 
+data class MonthBarEntry(val label: String, val value: Float)
+
 enum class TimeFilter { WEEKLY, MONTHLY }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -35,33 +37,35 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     private val _currentMonth = MutableStateFlow(Calendar.getInstance().get(Calendar.MONTH))
     private val _timeFilter = MutableStateFlow(TimeFilter.MONTHLY)
     private val _searchQuery = MutableStateFlow("")
+    private val _showFavoritesOnly = MutableStateFlow(false)
 
     val timeFilter: StateFlow<TimeFilter> = _timeFilter.asStateFlow()
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    val showFavoritesOnly: StateFlow<Boolean> = _showFavoritesOnly.asStateFlow()
 
     // Monthly transactions
     val transactions: StateFlow<List<Transaction>> = combine(
-        _currentYear, _currentMonth, _timeFilter, _searchQuery
-    ) { year, month, filter, query ->
-        // Combine inputs needed to generate our flow
+        _currentYear, _currentMonth, _timeFilter, _searchQuery, _showFavoritesOnly
+    ) { year, month, filter, query, favOnly ->
         object {
             val year = year
             val month = month
             val filter = filter
             val query = query.trim().lowercase()
+            val favOnly = favOnly
         }
     }.flatMapLatest { state ->
         val listFlow = when (state.filter) {
             TimeFilter.MONTHLY -> repository.getMonthlyTransactions(state.year, state.month)
             TimeFilter.WEEKLY -> repository.getWeeklyTransactions()
         }
-        
         listFlow.map { list ->
-            if (state.query.isEmpty()) list
-            else list.filter { 
-                it.category.lowercase().contains(state.query) || 
-                it.note.lowercase().contains(state.query) 
-            }
+            list
+                .let { if (state.favOnly) it.filter { t -> t.isFavorited } else it }
+                .let { if (state.query.isEmpty()) it else it.filter { t ->
+                    t.category.lowercase().contains(state.query) ||
+                    t.note.lowercase().contains(state.query)
+                }}
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -102,8 +106,34 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     val transactionCount: StateFlow<Int> = repository.getTransactionCount()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
+    // Favorites count — drives notification badge dynamically
+    val favoritesCount: StateFlow<Int> = repository.getAllTransactions()
+        .map { list -> list.count { it.isFavorited } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    // Real monthly bar chart — last 6 months from Room
+    val monthlyBarData: StateFlow<List<MonthBarEntry>> = flow {
+        val monthNames = arrayOf("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+        val months = (5 downTo 0).map { offset ->
+            val cal = Calendar.getInstance().apply { add(Calendar.MONTH, -offset) }
+            Triple(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), monthNames[cal.get(Calendar.MONTH)])
+        }
+        // Combine 6 separate flows into one list
+        combine(
+            months.map { (y, m, _) -> repository.getMonthlyExpense(y, m) }
+        ) { values ->
+            months.mapIndexed { i, (_, _, label) ->
+                MonthBarEntry(label, values[i].toFloat())
+            }
+        }.collect { emit(it) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     fun setTimeFilter(filter: TimeFilter) {
         _timeFilter.value = filter
+    }
+
+    fun toggleFavoritesFilter() {
+        _showFavoritesOnly.value = !_showFavoritesOnly.value
     }
 
     fun addTransaction(

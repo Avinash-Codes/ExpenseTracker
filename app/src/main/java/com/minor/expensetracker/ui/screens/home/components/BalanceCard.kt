@@ -109,7 +109,7 @@ fun BalanceCard(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "$${formatter.format(balance)}",
+                        text = "₹${formatter.format(balance)}",
                         style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.Bold,
                         color = Color.White

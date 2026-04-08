@@ -57,6 +57,9 @@ fun AppNavigation(
     val categoryBreakdown by transactionViewModel.categoryBreakdown.collectAsStateWithLifecycle()
     val totalExpenses by transactionViewModel.totalExpensesAllTime.collectAsStateWithLifecycle()
     val totalIncome by transactionViewModel.totalIncomeAllTime.collectAsStateWithLifecycle()
+    val monthlyBarData by transactionViewModel.monthlyBarData.collectAsStateWithLifecycle()
+    val favoritesCount by transactionViewModel.favoritesCount.collectAsStateWithLifecycle()
+    val showFavoritesOnly by transactionViewModel.showFavoritesOnly.collectAsStateWithLifecycle()
 
     // Auth check
     if (!isLoggedIn) {
@@ -70,10 +73,12 @@ fun AppNavigation(
     
     // Bottom sheet for adding transaction
     if (showAddTransaction) {
+        val sheetBg = if (isDarkMode) Color(0xFF141416).copy(alpha = 0.95f)
+                      else MaterialTheme.colorScheme.surface
         ModalBottomSheet(
             onDismissRequest = { showAddTransaction = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = Color(0xFF141416).copy(alpha = 0.95f),
+            containerColor = sheetBg,
             shape = BottomSheetShape,
             dragHandle = {
                 Box(
@@ -102,26 +107,41 @@ fun AppNavigation(
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
+                // Theme-aware bottom bar gradient
+                val barGradient = if (isDarkMode) {
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color(0xFF0C0C14).copy(alpha = 0.7f),
+                            Color(0xFF0C0C14)
+                        )
+                    )
+                } else {
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.85f),
+                            MaterialTheme.colorScheme.background
+                        )
+                    )
+                }
+                val navBarBg = if (isDarkMode) Color.White.copy(alpha = 0.05f)
+                               else MaterialTheme.colorScheme.surface
+                val navBarBorder = if (isDarkMode) Color.White.copy(alpha = 0.05f)
+                                   else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color(0xFF0C0C14).copy(alpha = 0.7f),
-                                    Color(0xFF0C0C14)
-                                )
-                            )
-                        )
+                        .background(barGradient)
                 ) {
                     NavigationBar(
                         modifier = Modifier
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                             .clip(BottomNavShape)
-                            .border(1.dp, Color.White.copy(alpha=0.05f), BottomNavShape)
+                            .border(1.dp, navBarBorder, BottomNavShape)
                             .shadow(0.dp, BottomNavShape),
-                        containerColor = Color.White.copy(alpha = 0.05f),
+                        containerColor = navBarBg,
                     tonalElevation = 0.dp
                 ) {
                     BottomNavItem.items.forEach { item ->
@@ -206,10 +226,13 @@ fun AppNavigation(
                     summary = summary,
                     timeFilter = timeFilter,
                     searchQuery = searchQuery,
+                    favoritesCount = favoritesCount,
+                    showFavoritesOnly = showFavoritesOnly,
                     onTimeFilterChange = { transactionViewModel.setTimeFilter(it) },
                     onSearchQueryChange = { transactionViewModel.setSearchQuery(it) },
                     onDeleteTransaction = { transactionViewModel.deleteTransaction(it) },
-                    onToggleFavorite = { transactionViewModel.toggleFavorite(it) }
+                    onToggleFavorite = { transactionViewModel.toggleFavorite(it) },
+                    onToggleFavoritesFilter = { transactionViewModel.toggleFavoritesFilter() }
                 )
             }
 
@@ -217,7 +240,8 @@ fun AppNavigation(
                 StatsScreen(
                     creditScore = creditScore,
                     summary = summary,
-                    categoryBreakdown = categoryBreakdown
+                    categoryBreakdown = categoryBreakdown,
+                    monthlyBarData = monthlyBarData
                 )
             }
 
