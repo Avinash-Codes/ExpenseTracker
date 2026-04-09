@@ -64,8 +64,13 @@ fun AppNavigation(
     val favoritesCount by transactionViewModel.favoritesCount.collectAsStateWithLifecycle()
     val showFavoritesOnly by transactionViewModel.showFavoritesOnly.collectAsStateWithLifecycle()
 
-    // Auth check
-    if (!isLoggedIn) {
+    // Splash screen while loading preferences
+    if (isLoggedIn == null) {
+        com.minor.expensetracker.ui.screens.splash.SplashScreen(onSplashFinished = {})
+        return
+    }
+    
+    if (isLoggedIn == false) {
         AuthScreen(
             onLogin = { name, email ->
                 profileViewModel.login(name, email)
@@ -209,6 +214,7 @@ fun AppNavigation(
             ) {
                 composable(BottomNavItem.Home.route) {
                     val searchQuery by transactionViewModel.searchQuery.collectAsStateWithLifecycle()
+                    val currentMonthLabel by transactionViewModel.currentMonthLabel.collectAsStateWithLifecycle()
                     HomeScreen(
                         userName = userName,
                         transactions = transactions,
@@ -217,7 +223,7 @@ fun AppNavigation(
                         searchQuery = searchQuery,
                         favoritesCount = favoritesCount,
                         showFavoritesOnly = showFavoritesOnly,
-                        currentMonthLabel = transactionViewModel.getCurrentMonthName(),
+                        currentMonthLabel = currentMonthLabel,
                         onTimeFilterChange = { transactionViewModel.setTimeFilter(it) },
                         onSearchQueryChange = { transactionViewModel.setSearchQuery(it) },
                         onDeleteTransaction = { transactionViewModel.deleteTransaction(it) },

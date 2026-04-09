@@ -56,6 +56,13 @@ fun ProfileScreen(
     LaunchedEffect(userName) { editName = userName }
     LaunchedEffect(userEmail) { editEmail = userEmail }
 
+    LaunchedEffect(showUpdateSuccess) {
+        if (showUpdateSuccess) {
+            kotlinx.coroutines.delay(3000)
+            showUpdateSuccess = false
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -195,6 +202,7 @@ fun ProfileScreen(
                         onUpdateProfile(editName, editEmail)
                         focusManager.clearFocus()
                         showUpdateSuccess = true
+                        selectedTab = 0
                     },
                     focusManager = focusManager
                 )

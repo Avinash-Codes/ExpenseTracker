@@ -42,6 +42,14 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     val timeFilter: StateFlow<TimeFilter> = _timeFilter.asStateFlow()
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
     val showFavoritesOnly: StateFlow<Boolean> = _showFavoritesOnly.asStateFlow()
+    
+    val currentMonthLabel: StateFlow<String> = _currentMonth.map { month ->
+        val monthNames = arrayOf(
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        )
+        monthNames[month]
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Loading...")
 
     // Monthly transactions
     val transactions: StateFlow<List<Transaction>> = combine(
@@ -55,9 +63,13 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
             val favOnly = favOnly
         }
     }.flatMapLatest { state ->
-        val listFlow = when (state.filter) {
-            TimeFilter.MONTHLY -> repository.getMonthlyTransactions(state.year, state.month)
-            TimeFilter.WEEKLY -> repository.getWeeklyTransactions()
+        val listFlow = if (state.favOnly || state.query.isNotEmpty()) {
+            repository.getAllTransactions()
+        } else {
+            when (state.filter) {
+                TimeFilter.MONTHLY -> repository.getMonthlyTransactions(state.year, state.month)
+                TimeFilter.WEEKLY -> repository.getWeeklyTransactions()
+            }
         }
         listFlow.map { list ->
             list
@@ -171,13 +183,7 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    fun getCurrentMonthName(): String {
-        val monthNames = arrayOf(
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        )
-        return monthNames[_currentMonth.value]
-    }
+    // Removed static getCurrentMonthName in favor of reactive currentMonthLabel Flow
 
     fun navigateMonth(delta: Int) {
         val cal = Calendar.getInstance().apply {

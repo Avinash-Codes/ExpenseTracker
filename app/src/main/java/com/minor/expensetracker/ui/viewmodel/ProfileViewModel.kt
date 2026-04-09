@@ -25,8 +25,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     val isDarkMode: StateFlow<Boolean> = preferencesManager.isDarkMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    val isLoggedIn: StateFlow<Boolean> = preferencesManager.isLoggedIn
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val isLoggedIn: StateFlow<Boolean?> = preferencesManager.isLoggedIn
+        .map { it as Boolean? }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     /**
      * Financial Health Score (0-900) calculated from real data:
@@ -122,6 +123,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     fun exportCsv(context: android.content.Context) {
         viewModelScope.launch {
             val transactions = transactionDao.getAllTransactions().first()
+            if (transactions.isEmpty()) {
+                android.widget.Toast.makeText(context, "No transactions available to export", android.widget.Toast.LENGTH_SHORT).show()
+                return@launch
+            }
             CsvExporter.exportAndShare(context, transactions)
         }
     }

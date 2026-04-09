@@ -6,11 +6,15 @@ A modern, fintech-style expense tracking app built with **Jetpack Compose** for 
 
 ## Screenshots
 
-> **How to add:** Run the app on an emulator, press Ctrl+S (Mac: Cmd+S) in Android Studio to capture screens, then drop them into a `screenshots/` folder and update the paths below.
+### Dark Theme
+| Splash | Sign In | Sign Up | Home | Analytics | Profile |
+|---|---|---|---|---|---|
+| `screenshots/splash_dark.png` | `screenshots/signin_dark.png` | `screenshots/signup_dark.png` | `screenshots/home_dark.png` | `screenshots/analytics_dark.png` | `screenshots/profile_dark.png` |
 
-| Home (Dark) | Home (Light) | Analytics | Profile |
-|---|---|---|---|
-| `screenshots/home_dark.png` | `screenshots/home_light.png` | `screenshots/analytics.png` | `screenshots/profile.png` |
+### Light Theme
+| Splash | Sign In | Sign Up | Home | Analytics | Profile |
+|---|---|---|---|---|---|
+| `screenshots/splash_light.png` | `screenshots/signin_light.png` | `screenshots/signup_light.png` | `screenshots/home_light.png` | `screenshots/analytics_light.png` | `screenshots/profile_light.png` |
 
 ---
 
@@ -47,6 +51,8 @@ A modern, fintech-style expense tracking app built with **Jetpack Compose** for 
 - **Appearance toggle** — dark/light mode switch with immediate effect
 
 ### Architecture & UX
+- **Custom app icon** — branded ₹ symbol on a teal gradient adaptive icon
+- **Animated splash screen** — pulsating glow + staggered fade-in via AndroidX SplashScreen API
 - **Glassmorphism UI** — cards use glass effect that adapts correctly in both dark and light mode
 - **Animated mesh background** — animated teal/purple glow blobs, theme-aware colours
 - **Empty states** — illustrated states for no transactions, no search results, no favourites
@@ -67,6 +73,7 @@ A modern, fintech-style expense tracking app built with **Jetpack Compose** for 
 | Preferences | DataStore |
 | Navigation | Navigation Compose |
 | File sharing | FileProvider + Android share sheet |
+| Splash | AndroidX Core SplashScreen 1.0 |
 | Build | Gradle 8.11 / AGP 8.x |
 
 ---
@@ -109,6 +116,7 @@ app/src/main/java/com/minor/expensetracker/
 │   ├── navigation/      # AppNavigation, BottomNavItem
 │   ├── screens/
 │   │   ├── auth/        # AuthScreen (name + email onboarding)
+│   │   ├── splash/      # SplashScreen (animated branded intro)
 │   │   ├── home/        # HomeScreen + BalanceCard, TransactionItem, SegmentedToggle
 │   │   ├── stats/       # StatsScreen + CategoryPieChart, MonthlyBarChart, CreditScoreGauge
 │   │   ├── profile/     # ProfileScreen (overview + edit tabs, export)
