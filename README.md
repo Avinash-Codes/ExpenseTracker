@@ -7,14 +7,14 @@ A modern, fintech-style expense tracking app built with **Jetpack Compose** for 
 ## Screenshots
 
 ### Dark Theme
-| Splash | Sign In | Sign Up | Home | Analytics | Profile |
-|---|---|---|---|---|---|
-| `screenshots/splash_dark.png` | `screenshots/signin_dark.png` | `screenshots/signup_dark.png` | `screenshots/home_dark.png` | `screenshots/analytics_dark.png` | `screenshots/profile_dark.png` |
+| Sign In | Sign Up | Analytics | Profile |
+|---|---|---|---|
+| ![Sign In Dark](screenshots/signin_dark.png) | ![Sign Up Dark](screenshots/signup_dark.png) | ![Analytics Dark](screenshots/analytics_dark.png) | ![Profile Dark](screenshots/profile_dark.png) |
 
 ### Light Theme
-| Splash | Sign In | Sign Up | Home | Analytics | Profile |
-|---|---|---|---|---|---|
-| `screenshots/splash_light.png` | `screenshots/signin_light.png` | `screenshots/signup_light.png` | `screenshots/home_light.png` | `screenshots/analytics_light.png` | `screenshots/profile_light.png` |
+| Sign In | Sign Up | Analytics | Profile |
+|---|---|---|---|
+| ![Sign In Light](screenshots/signin_light.png) | ![Sign Up Light](screenshots/signup_light.png) | ![Analytics Light](screenshots/analytics_light.png) | ![Profile Light](screenshots/profile_light.png) |
 
 ---
 
