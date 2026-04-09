@@ -38,11 +38,14 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.ChevronLeft
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Star
 
 @Composable
@@ -54,12 +57,16 @@ fun HomeScreen(
     searchQuery: String,
     favoritesCount: Int = 0,
     showFavoritesOnly: Boolean = false,
+    currentMonthLabel: String = "",
     onTimeFilterChange: (TimeFilter) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onDeleteTransaction: (Transaction) -> Unit,
     onToggleFavorite: (Transaction) -> Unit,
     onToggleFavoritesFilter: () -> Unit = {},
+    onPreviousMonth: () -> Unit = {},
+    onNextMonth: () -> Unit = {},
     onAddTransaction: () -> Unit,
+    onTransactionClick: (Long) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -239,7 +246,7 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                // Recent Transactions header + filter
+                // Recent Transactions header + month navigator
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -255,6 +262,39 @@ fun HomeScreen(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
+                    // Month navigator — only shown when in normal/monthly view
+                    if (searchQuery.isEmpty() && !showFavoritesOnly && timeFilter == TimeFilter.MONTHLY) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(
+                                onClick = onPreviousMonth,
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    Icons.Rounded.ChevronLeft,
+                                    contentDescription = "Previous month",
+                                    tint = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Text(
+                                text = currentMonthLabel,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            IconButton(
+                                onClick = onNextMonth,
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(
+                                    Icons.Rounded.ChevronRight,
+                                    contentDescription = "Next month",
+                                    tint = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -299,6 +339,7 @@ fun HomeScreen(
                     transaction = transaction,
                     onDelete = { onDeleteTransaction(transaction) },
                     onToggleFavorite = { onToggleFavorite(transaction) },
+                    onTransactionClick = { onTransactionClick(transaction.id) },
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
                     index = index
                 )

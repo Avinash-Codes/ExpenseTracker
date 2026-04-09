@@ -38,5 +38,7 @@ sealed class BottomNavItem(
 
     companion object {
         val items = listOf(Home, Balances, Profile)
+        const val EDIT_TRANSACTION_ROUTE = "edit_transaction/{transactionId}"
+        fun editTransactionRoute(id: Long) = "edit_transaction/$id"
     }
 }

@@ -7,6 +7,7 @@ import com.minor.expensetracker.data.local.AppDatabase
 import com.minor.expensetracker.data.local.PreferencesManager
 import com.minor.expensetracker.data.model.TransactionType
 import com.minor.expensetracker.ui.theme.ThemeState
+import com.minor.expensetracker.util.CsvExporter
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -116,5 +117,12 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     fun logout() {
         viewModelScope.launch { preferencesManager.updateLoggedIn(false) }
+    }
+
+    fun exportCsv(context: android.content.Context) {
+        viewModelScope.launch {
+            val transactions = transactionDao.getAllTransactions().first()
+            CsvExporter.exportAndShare(context, transactions)
+        }
     }
 }

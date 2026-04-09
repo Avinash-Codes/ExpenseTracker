@@ -28,7 +28,9 @@ fun MonthlyBarChart(
     modifier: Modifier = Modifier,
     title: String = "Last 6 months expenses"
 ) {
-    val maxValue = data.maxOfOrNull { it.value } ?: 1f
+    if (data.isEmpty() || (data.size == 1 && data[0].label == "—")) return
+
+    val maxValue = data.maxOfOrNull { it.value }?.takeIf { it > 0f } ?: 1f
 
     val animatedProgress by animateFloatAsState(
         targetValue = 1f,
@@ -36,7 +38,6 @@ fun MonthlyBarChart(
         label = "barAnim"
     )
 
-    val textColor = MaterialTheme.colorScheme.onSurfaceVariant
     val barColors = listOf(
         listOf(ChartBar1, ChartBar1.copy(alpha = 0.6f)),
         listOf(ChartBar2, ChartBar2.copy(alpha = 0.6f)),

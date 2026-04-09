@@ -30,10 +30,13 @@ import com.minor.expensetracker.ui.screens.home.HomeScreen
 import com.minor.expensetracker.ui.screens.profile.ProfileScreen
 import com.minor.expensetracker.ui.screens.stats.StatsScreen
 import com.minor.expensetracker.ui.screens.transaction.AddTransactionSheet
+import com.minor.expensetracker.ui.screens.transaction.EditTransactionScreen
 import com.minor.expensetracker.ui.theme.*
 import com.minor.expensetracker.ui.viewmodel.ProfileViewModel
 import com.minor.expensetracker.ui.viewmodel.TransactionViewModel
 import com.minor.expensetracker.ui.components.AnimatedMeshBackground
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,9 +129,9 @@ fun AppNavigation(
                     )
                 }
                 val navBarBg = if (isDarkMode) Color.White.copy(alpha = 0.05f)
-                               else MaterialTheme.colorScheme.surface
+                else MaterialTheme.colorScheme.surface
                 val navBarBorder = if (isDarkMode) Color.White.copy(alpha = 0.05f)
-                                   else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
 
                 Box(
                     modifier = Modifier
@@ -142,112 +145,138 @@ fun AppNavigation(
                             .border(1.dp, navBarBorder, BottomNavShape)
                             .shadow(0.dp, BottomNavShape),
                         containerColor = navBarBg,
-                    tonalElevation = 0.dp
-                ) {
-                    BottomNavItem.items.forEach { item ->
-                        val selected = currentRoute == item.route
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                        tonalElevation = 0.dp
+                    ) {
+                        BottomNavItem.items.forEach { item ->
+                            val selected = currentRoute == item.route
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(item.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
-                                    contentDescription = item.label,
-                                    modifier = Modifier.size(24.dp)
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
+                                        contentDescription = item.label,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = item.label,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                                 )
-                            },
-                            label = {
-                                Text(
-                                    text = item.label,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-                                )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
                             )
+                        }
+                    }
+                }
+            },
+            // FAB removed; add transaction moved to top bar
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = BottomNavItem.Home.route,
+                modifier = Modifier
+                    .padding(top = innerPadding.calculateTopPadding())
+                    .imePadding(),
+                enterTransition = {
+                    fadeIn(tween(300)) + slideInHorizontally(tween(300)) { it / 4 }
+                },
+                exitTransition = {
+                    fadeOut(tween(200)) + slideOutHorizontally(tween(200)) { -it / 4 }
+                },
+                popEnterTransition = {
+                    fadeIn(tween(300)) + slideInHorizontally(tween(300)) { -it / 4 }
+                },
+                popExitTransition = {
+                    fadeOut(tween(200)) + slideOutHorizontally(tween(200)) { it / 4 }
+                }
+            ) {
+                composable(BottomNavItem.Home.route) {
+                    val searchQuery by transactionViewModel.searchQuery.collectAsStateWithLifecycle()
+                    HomeScreen(
+                        userName = userName,
+                        transactions = transactions,
+                        summary = summary,
+                        timeFilter = timeFilter,
+                        searchQuery = searchQuery,
+                        favoritesCount = favoritesCount,
+                        showFavoritesOnly = showFavoritesOnly,
+                        currentMonthLabel = transactionViewModel.getCurrentMonthName(),
+                        onTimeFilterChange = { transactionViewModel.setTimeFilter(it) },
+                        onSearchQueryChange = { transactionViewModel.setSearchQuery(it) },
+                        onDeleteTransaction = { transactionViewModel.deleteTransaction(it) },
+                        onToggleFavorite = { transactionViewModel.toggleFavorite(it) },
+                        onToggleFavoritesFilter = { transactionViewModel.toggleFavoritesFilter() },
+                        onPreviousMonth = { transactionViewModel.navigateMonth(-1) },
+                        onNextMonth = { transactionViewModel.navigateMonth(1) },
+                        onAddTransaction = { showAddTransaction = true },
+                        onTransactionClick = { id ->
+                            navController.navigate(BottomNavItem.editTransactionRoute(id))
+                        }
+                    )
+                }
+
+                composable(BottomNavItem.Balances.route) {
+                    StatsScreen(
+                        creditScore = creditScore,
+                        summary = summary,
+                        categoryBreakdown = categoryBreakdown,
+                        monthlyBarData = monthlyBarData
+                    )
+                }
+
+                composable(BottomNavItem.Profile.route) {
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    ProfileScreen(
+                        userName = userName,
+                        userEmail = userEmail,
+                        totalSpendings = totalExpenses,
+                        totalBalance = totalIncome - totalExpenses,
+                        isDarkMode = isDarkMode,
+                        onToggleDarkMode = { profileViewModel.toggleDarkMode() },
+                        onUpdateProfile = { name, email ->
+                            profileViewModel.updateUserName(name)
+                            profileViewModel.updateUserEmail(email)
+                        },
+                        onLogout = { profileViewModel.logout() },
+                        onExportCsv = { profileViewModel.exportCsv(context) }
+                    )
+                }
+
+                composable(
+                    route = BottomNavItem.EDIT_TRANSACTION_ROUTE,
+                    arguments = listOf(navArgument("transactionId") { type = NavType.LongType })
+                ) { backStackEntry ->
+                    val transactionId =
+                        backStackEntry.arguments?.getLong("transactionId") ?: return@composable
+                    val allTransactions by transactionViewModel.allTransactions.collectAsStateWithLifecycle()
+                    val transaction = allTransactions.find { it.id == transactionId }
+                    if (transaction != null) {
+                        EditTransactionScreen(
+                            transaction = transaction,
+                            onDismiss = { navController.popBackStack() },
+                            onSave = { updated -> transactionViewModel.updateTransaction(updated) },
+                            onDelete = { toDelete -> transactionViewModel.deleteTransaction(toDelete) }
                         )
                     }
                 }
             }
-        },
-        // FAB removed; add transaction moved to top bar
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = BottomNavItem.Home.route,
-            modifier = Modifier
-                .padding(top = innerPadding.calculateTopPadding())
-                .imePadding(),
-            enterTransition = {
-                fadeIn(tween(300)) + slideInHorizontally(tween(300)) { it / 4 }
-            },
-            exitTransition = {
-                fadeOut(tween(200)) + slideOutHorizontally(tween(200)) { -it / 4 }
-            },
-            popEnterTransition = {
-                fadeIn(tween(300)) + slideInHorizontally(tween(300)) { -it / 4 }
-            },
-            popExitTransition = {
-                fadeOut(tween(200)) + slideOutHorizontally(tween(200)) { it / 4 }
-            }
-        ) {
-            composable(BottomNavItem.Home.route) {
-                val searchQuery by transactionViewModel.searchQuery.collectAsStateWithLifecycle()
-                HomeScreen(
-                    userName = userName,
-                    transactions = transactions,
-                    summary = summary,
-                    timeFilter = timeFilter,
-                    searchQuery = searchQuery,
-                    favoritesCount = favoritesCount,
-                    showFavoritesOnly = showFavoritesOnly,
-                    onTimeFilterChange = { transactionViewModel.setTimeFilter(it) },
-                    onSearchQueryChange = { transactionViewModel.setSearchQuery(it) },
-                    onDeleteTransaction = { transactionViewModel.deleteTransaction(it) },
-                    onToggleFavorite = { transactionViewModel.toggleFavorite(it) },
-                    onToggleFavoritesFilter = { transactionViewModel.toggleFavoritesFilter() },
-                    onAddTransaction = { showAddTransaction = true }
-                )
-            }
-
-            composable(BottomNavItem.Balances.route) {
-                StatsScreen(
-                    creditScore = creditScore,
-                    summary = summary,
-                    categoryBreakdown = categoryBreakdown,
-                    monthlyBarData = monthlyBarData
-                )
-            }
-
-            composable(BottomNavItem.Profile.route) {
-                ProfileScreen(
-                    userName = userName,
-                    userEmail = userEmail,
-                    totalSpendings = totalExpenses,
-                    totalBalance = totalIncome - totalExpenses,
-                    isDarkMode = isDarkMode,
-                    onToggleDarkMode = { profileViewModel.toggleDarkMode() },
-                    onUpdateProfile = { name, email ->
-                        profileViewModel.updateUserName(name)
-                        profileViewModel.updateUserEmail(email)
-                    },
-                    onLogout = { profileViewModel.logout() }
-                )
-            }
         }
     }
-}
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -39,6 +40,7 @@ fun ProfileScreen(
     onToggleDarkMode: () -> Unit,
     onUpdateProfile: (name: String, email: String) -> Unit,
     onLogout: () -> Unit,
+    onExportCsv: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -175,7 +177,8 @@ fun ProfileScreen(
                     balance = totalBalance,
                     isDarkMode = isDarkMode,
                     onToggleDarkMode = onToggleDarkMode,
-                    onLogout = onLogout
+                    onLogout = onLogout,
+                    onExportCsv = onExportCsv
                 )
                 1 -> EditContent(
                     name = editName,
@@ -207,7 +210,8 @@ private fun OverviewContent(
     balance: Double,
     isDarkMode: Boolean,
     onToggleDarkMode: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onExportCsv: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -285,6 +289,48 @@ private fun OverviewContent(
                     checkedThumbColor = MaterialTheme.colorScheme.primary,
                     checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                 )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Export transactions
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .glassEffect()
+                .clickable { onExportCsv() }
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Rounded.Share,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(22.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "Export transactions",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Text(
+                        text = "Download as CSV file",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            Icon(
+                imageVector = Icons.Rounded.ArrowForwardIos,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(14.dp)
             )
         }
 

@@ -50,6 +50,12 @@ fun BalanceCard(
             maximumFractionDigits = 0
         }
     }
+    val validThru = remember {
+        val cal = java.util.Calendar.getInstance()
+        val month = String.format(Locale.US, "%02d", cal.get(java.util.Calendar.MONTH) + 1)
+        val year = (cal.get(java.util.Calendar.YEAR) + 3).toString().takeLast(2)
+        "$month/$year"
+    }
 
     Box(
         modifier = modifier
@@ -165,7 +171,7 @@ fun BalanceCard(
                         color = Color.White.copy(alpha = 0.6f)
                     )
                     Text(
-                        text = "12/28",
+                        text = validThru,
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.White,
                         fontWeight = FontWeight.Medium

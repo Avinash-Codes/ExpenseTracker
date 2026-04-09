@@ -56,23 +56,6 @@ class TransactionRepository(private val dao: TransactionDao) {
 
     suspend fun getTransactionById(id: Long): Transaction? = dao.getTransactionById(id)
 
-    // Get monthly data for chart (last 6 months)
-    fun getMonthlyExpenseForChart(): List<Pair<String, Flow<Double>>> {
-        val calendar = Calendar.getInstance()
-        val result = mutableListOf<Pair<String, Flow<Double>>>()
-        val monthNames = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-
-        for (i in 5 downTo 0) {
-            val cal = Calendar.getInstance()
-            cal.add(Calendar.MONTH, -i)
-            val year = cal.get(Calendar.YEAR)
-            val month = cal.get(Calendar.MONTH)
-            val label = monthNames[month]
-            result.add(label to getMonthlyExpense(year, month))
-        }
-        return result
-    }
-
     private fun getMonthRange(year: Int, month: Int): Pair<Long, Long> {
         val start = Calendar.getInstance().apply {
             set(year, month, 1, 0, 0, 0)

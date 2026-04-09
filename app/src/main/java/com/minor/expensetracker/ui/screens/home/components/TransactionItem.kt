@@ -1,5 +1,6 @@
 package com.minor.expensetracker.ui.screens.home.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -35,6 +36,7 @@ fun TransactionItem(
     transaction: Transaction,
     onDelete: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onTransactionClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     index: Int = 0
 ) {
@@ -98,6 +100,7 @@ fun TransactionItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .glassEffect()
+                    .clickable { onTransactionClick() }
                     .background(
                         brush = Brush.horizontalGradient(
                             colors = listOf(

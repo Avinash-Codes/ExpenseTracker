@@ -106,8 +106,12 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
     val transactionCount: StateFlow<Int> = repository.getTransactionCount()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    // Favorites count — drives notification badge dynamically
-    val favoritesCount: StateFlow<Int> = repository.getAllTransactions()
+    // All transactions (unfiltered) — used by edit screen and CSV export
+    val allTransactions: StateFlow<List<Transaction>> = repository.getAllTransactions()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // Favorites count — derived from allTransactions, drives badge dynamically
+    val favoritesCount: StateFlow<Int> = allTransactions
         .map { list -> list.count { it.isFavorited } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
@@ -193,6 +197,12 @@ class TransactionViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch {
             val updated = transaction.copy(isFavorited = !transaction.isFavorited)
             repository.updateTransaction(updated)
+        }
+    }
+
+    fun updateTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            repository.updateTransaction(transaction)
         }
     }
 }
